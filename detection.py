@@ -13,7 +13,7 @@ def findPoints(image, threshold, template):
     w, h = template.shape[::-1]
     loc = np.where( res >= threshold)
     prevPoint = []
-    mask = np.zeros(img.shape[:2], np.uint8)
+    mask = np.zeros(image.shape, np.uint8)
     for pt in zip(*loc[::-1]):
         y = np.floor(pt[1] + h/2).astype(int)
         x = np.floor(pt[0] + w/2).astype(int)
