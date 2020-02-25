@@ -2,6 +2,5 @@ flask
 flask-RESTful
 gunicorn
 requests
-json
 numpy
 opencv-python
