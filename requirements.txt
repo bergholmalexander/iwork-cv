@@ -3,4 +3,4 @@ flask-RESTful
 gunicorn
 requests
 numpy
-opencv-python
+opencv-python-headless
