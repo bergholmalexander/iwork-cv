@@ -13,9 +13,13 @@ def findPoints(image, threshold, template):
     w, h = template.shape[::-1]
     loc = np.where( res >= threshold)
     prevPoint = []
+    mask = np.zeros(img.shape[:2], np.uint8)
     for pt in zip(*loc[::-1]):
-        if (pt not in prevPoint): # TODO: Handle near other already found points
-            prevPoint.append(pt) # Handle already detected case
+        y = np.floor(pt[1] + h/2).astype(int)
+        x = np.floor(pt[0] + w/2).astype(int)
+        if ((x,y) not in prevPoint and mask[y, x] != 255): # TODO: Handle near other already found points
+            mask[pt[1]:pt[1]+h, pt[0]:pt[0]+w] = 255
+            prevPoint.append((x,y)) # Handle already detected case
     return json.dumps(prevPoint, cls=NpEncoder)
 
 class NpEncoder(json.JSONEncoder):
