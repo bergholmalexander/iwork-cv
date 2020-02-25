@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import json
 
 # def match(image, template):
 #     return cv2.matchTemplate(image,template,cv2.TM_CCOEFF_NORMED)
@@ -15,4 +16,15 @@ def findPoints(image, threshold, template):
     for pt in zip(*loc[::-1]):
         if (pt not in prevPoint): # TODO: Handle near other already found points
             prevPoint.append(pt) # Handle already detected case
-    return prevPoint
+    return json.dumps(prevPoint, cls=NpEncoder)
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NpEncoder, self).default(obj)
