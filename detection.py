@@ -10,7 +10,7 @@ def findPoints(image, threshold, template):
     res = cv2.matchTemplate(image,template,cv2.TM_CCOEFF_NORMED) #match(img_gray, template)
     # template = cv2.resize(template, (28,25), cv2.INTER_CUBIC)
     w, h = template.shape[::-1]
-    loc = np.where( res >= args.threshold)
+    loc = np.where( res >= threshold)
     prevPoint = []
     for pt in zip(*loc[::-1]):
         if (pt not in prevPoint): # TODO: Handle near other already found points

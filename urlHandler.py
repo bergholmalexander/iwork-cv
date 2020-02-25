@@ -1,5 +1,7 @@
 import requests, json
-# import urllib
+import urllib
+import numpy as np
+import cv2
 
 def getUrl(id):
     baseURL = 'https://icbc-go-api.herokuapp.com/floors/' # Should we be making this a get request?
