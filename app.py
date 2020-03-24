@@ -44,26 +44,26 @@ class GetCoordinates(Resource):
             abort(500, "Internal Server Error: OCR failed")
         return o, 200
 
-class GetCoordinatesByURL(Resource):
-    def get(self, url):
-        try:
-            image = urlHandler.getGDImage(url)
-        except:
-            abort(404, "Not Found: Could not download an image at given url")
-        try:
-            templates = utils.getTemplates()
-            w, h = utils.hwAverage(templates)[::-1]
-        except:
-            abort(404, "Not Found: Could not download template at given url")
-        try:
-            points = detection.findPointsAllTemplates(image, 0.6, templates)
-        except:
-            abort(500, "Internal Server Error: Template Matching algorithm failed")
-        try:
-            #o = ocr.bulkPointOCR(points, image, w, h)
-        except:
-            abort(500, "Internal Server Error: OCR failed")
-        return o, 200
+# class GetCoordinatesByURL(Resource):
+#     def get(self, url):
+#         try:
+#             image = urlHandler.getGDImage(url)
+#         except:
+#             abort(404, "Not Found: Could not download an image at given url")
+#         try:
+#             templates = utils.getTemplates()
+#             w, h = utils.hwAverage(templates)[::-1]
+#         except:
+#             abort(404, "Not Found: Could not download template at given url")
+#         try:
+#             points = detection.findPointsAllTemplates(image, 0.6, templates)
+#         except:
+#             abort(500, "Internal Server Error: Template Matching algorithm failed")
+#         try:
+#             o = ocr.bulkPointOCR(points, image, w, h)
+#         except:
+#             abort(500, "Internal Server Error: OCR failed")
+#         return o, 200
 
 api.add_resource(HelloWorld, '/') # Landing page
 api.add_resource(GetCoordinates, '/floors/detect/<string:id>')
