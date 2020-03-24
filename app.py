@@ -4,7 +4,9 @@ import requests
 import urllib
 import urlHandler
 import detection
+import ocr
 import json
+import utils
 
 app = Flask(__name__)
 api = Api(app)
@@ -27,17 +29,45 @@ class GetCoordinates(Resource):
         except:
             abort(404, "Not Found: Could not download an image at given url")
         try:
-            template = urlHandler.getGDImage('https://drive.google.com/uc?export=download&id=1FLqmm12Q3DEM_Ae7QfDHl8HOZeO_-Ffr')
+            templates = utils.getTemplates()
+            w, h = utils.hwAverage(templates)[::-1]
+            # w, h = template.shape[::-1]
+        except:
+            abort(500, "Internal Server Error: Failed to handle templates")
+        try:
+            points = detection.findPointsAllTemplates(image, 0.6, templates)
+        except:
+            abort(500, "Internal Server Error: Template Matching algorithm failed")
+        try:
+            o = ocr.bulkPointOCR(points, image, w, h)
+        except:
+            abort(500, "Internal Server Error: OCR failed")
+        return o, 200
+
+class GetCoordinatesByURL(Resource):
+    def get(self, url):
+        try:
+            image = urlHandler.getGDImage(url)
+        except:
+            abort(404, "Not Found: Could not download an image at given url")
+        try:
+            templates = utils.getTemplates()
+            w, h = utils.hwAverage(templates)[::-1]
         except:
             abort(404, "Not Found: Could not download template at given url")
         try:
-            points = detection.findPoints(image, 0.5, template)
+            points = detection.findPointsAllTemplates(image, 0.6, templates)
         except:
             abort(500, "Internal Server Error: Template Matching algorithm failed")
-        return {'coordinates': points}, 200
+        try:
+            #o = ocr.bulkPointOCR(points, image, w, h)
+        except:
+            abort(500, "Internal Server Error: OCR failed")
+        return o, 200
 
 api.add_resource(HelloWorld, '/') # Landing page
-api.add_resource(GetCoordinates, '/floors/detect/<string:id>') # Landing page
+api.add_resource(GetCoordinates, '/floors/detect/<string:id>')
+#api.add_resource(GetCoordinatesByURL, '/floors/detectu/<string:url>')
 
 if __name__ == '__main__':
     app.run(debug=True)
