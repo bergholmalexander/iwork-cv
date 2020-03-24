@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import pytesseract
-
+pytesseract.pytesseract.tesseract_cmd = '/app/.apt/usr/bin/tesseract'
 def bulkPointOCR(points, img, w, h):
     compiled = []
     for p in points:
