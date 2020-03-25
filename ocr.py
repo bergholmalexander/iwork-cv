@@ -13,7 +13,7 @@ def bulkPointOCR(points, img, w, h):
         print("printing match")
         print(match.shape)
         print("printing edges")
-        print(img[p[1]-np.floor(h/2).astype(int))
+        print(p[1]-np.floor(h/2).astype(int))
         print(p[1]+np.floor(h/2).astype(int)+1)
         print((p[0]-np.floor(w/2).astype(int)))
         print(p[0]+np.floor(w/2).astype(int)+1])
