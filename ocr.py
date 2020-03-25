@@ -10,6 +10,13 @@ def bulkPointOCR(points, img, w, h):
         print("before match")
         match = cv2.cvtColor(img[p[1]-np.floor(h/2).astype(int):p[1]+np.floor(h/2).astype(int)+1, (p[0]-np.floor(w/2).astype(int)):p[0]+np.floor(w/2).astype(int)+1], cv2.COLOR_BGR2RGB)
         print("after match")
+        print("printing match")
+        print(match.shape)
+        print("printing edges")
+        print(img[p[1]-np.floor(h/2).astype(int))
+        print(p[1]+np.floor(h/2).astype(int)+1)
+        print((p[0]-np.floor(w/2).astype(int)))
+        print(p[0]+np.floor(w/2).astype(int)+1])
         text = pytesseract.image_to_string(match,
                             config='--psm 13 --oem 3 -c tessedit_char_whitelist=0123456789ABC')
         if text == "":
