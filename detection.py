@@ -16,9 +16,10 @@ def findPoints(image, threshold, template):
     for pt in zip(*loc[::-1]):
         y = np.floor(pt[1] + h/2).astype(int)
         x = np.floor(pt[0] + w/2).astype(int)
-        if ((x,y) not in prevPoint and mask[y, x] != 255): # TODO: Handle near other already found points
+        if (mask[y, x] != 255): # TODO: Handle near other already found points
             mask[pt[1]:pt[1]+h, pt[0]:pt[0]+w] = 255
             prevPoint.append((x,y)) # Handle already detected case
+        # prevPoint.append((x,y))
     return prevPoint
 
 def findPointsAllTemplates(image, threshold, templates):

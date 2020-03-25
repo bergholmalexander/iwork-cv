@@ -35,7 +35,7 @@ class GetCoordinates(Resource):
         except:
             abort(500, "Internal Server Error: Failed to handle templates")
         try:
-            points = detection.findPointsAllTemplates(image, 0.6, templates)
+            points = detection.findPointsAllTemplates(image, 0.8, templates)
         except:
             abort(500, "Internal Server Error: Template Matching algorithm failed")
         try:
