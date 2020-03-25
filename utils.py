@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 
 def getTemplates(path="templates/"):
+    print(glob.glob(path+"*"))
     return [cv2.imread(i, 0) for i in glob.glob(path+"*")]
 
 def hwAverage(templates):
