@@ -12,8 +12,15 @@ def bulkPointOCR(points, img, w, h):
     compiled = []
     for p in points:
         print("performing task on point", p)
-        match = cv2.cvtColor(img[p[1]-np.floor(h/2).astype(int):p[1]+np.floor(h/2).astype(int)+1, (p[0]-np.floor(w/2).astype(int)):p[0]+np.floor(w/2).astype(int)+1], cv2.COLOR_BGR2RGB)
-        text = pytesseract.image_to_string(match,
+        try:
+            match = cv2.cvtColor(img[p[1]-np.floor(h/2).astype(int):p[1]+np.floor(h/2).astype(int)+1, (p[0]-np.floor(w/2).astype(int)):p[0]+np.floor(w/2).astype(int)+1], cv2.COLOR_BGR2RGB)
+        except Exception as e:
+            print(e)
+        print("Match has shape", match.shape)
+        try:
+            text = pytesseract.image_to_string(match,
                             config='--psm 13 --oem 3 -c tessedit_char_whitelist=0123456789ABC')
+        except Exception as e:
+            print(e)
         compiled.append({"x": int(p[0]), "y": int(p[1]), "workspace_name": text})
     return compiled
