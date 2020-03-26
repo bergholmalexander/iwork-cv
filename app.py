@@ -6,7 +6,8 @@ from flask_cors import CORS
 #import datetime
 
 app = Flask(__name__)
-api = CORS(app)
+CORS(app)
+api = Api(app)
 
 class HelloWorld(Resource):
     def get(self):
