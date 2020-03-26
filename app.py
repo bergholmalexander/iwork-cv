@@ -14,6 +14,9 @@ CORS(app)
 api = Api(app)
 q = rq.Queue(connection=conn)
 
+# CONFIG
+threshold = 0.5
+
 class HelloWorld(Resource):
     def get(self):
         return {'about': 'Hello World!'}
@@ -21,32 +24,8 @@ class HelloWorld(Resource):
 class GetCoordinates(Resource):
     def get(self, id):
         # TODO: Error checking i.e. id empty
-        job = q.enqueue(performCV, id)
-        # if id == "":
-        #     abort(400, "Bad Request: No id was entered")
-        # try:
-        #     url = urlHandler.getUrl(id)
-        # except:
-        #     abort(404, "Not Found: Could not find url for given id")
-        # try:
-        #     image = urlHandler.getGDImage(url)
-        # except:
-        #     abort(404, "Not Found: Could not download an image at given url")
-        # try:
-        #     templates = utils.getTemplates()
-        #     w, h = utils.hwAverage(templates)[::-1]
-        #     # w, h = template.shape[::-1]
-        # except:
-        #     abort(500, "Internal Server Error: Failed to handle templates")
-        # try:
-        #     points = detection.findPointsAllTemplates(image, 0.7, templates)
-        # except:
-        #     abort(500, "Internal Server Error: Template Matching algorithm failed")
-        # try:
-        #     o = ocr.bulkPointOCR(points, image, w, h)
-        # except:
-        #     abort(500, "Internal Server Error: OCR failed")
-        return job.get_id(),    201
+        job = q.enqueue(performCVByID, id)
+        return job.get_id(), 201
 
 class Timeout(Resource):
     def get(self):
@@ -90,9 +69,11 @@ class Ping(Resource):
         except: #(redis.exceptions.RedisError, rq.exceptions.NoSuchJobError)
             abort(400, "Bad Request: ID was not found")
         if rq_job.is_finished:
-            return rq_job.result, 200
+            if rq_job.result[0] != 200:
+                abort(rq_job.result[0], rq_job.result[1])
+            return rq_job.result[1], 200
         else:
-            return 202
+            return "Incomplete task", 202
 
 api.add_resource(HelloWorld, '/') # Landing page
 api.add_resource(GetCoordinates, '/floors/detect/<string:id>')
@@ -101,7 +82,7 @@ api.add_resource(Timeout, '/sleep') # make sleep and timeout
 api.add_resource(Ping, '/ping/<string:id>') # make sleep and timeout
 #api.add_resource(GetCoordinatesByURL, '/floors/detectu/<string:url>')
 
-def performCV(id):
+def performCVByID(id):
     if id == "":
         return (400, "Bad Request: No id was entered") #abort(400, "Bad Request: No id was entered")
     try:
@@ -119,7 +100,28 @@ def performCV(id):
     except:
         return (500, "Internal Server Error: Failed to handle templates")
     try:
-        points = detection.findPointsAllTemplates(image, 0.7, templates)
+        points = detection.findPointsAllTemplates(image, threshold, templates)
+    except:
+        return (500, "Internal Server Error: Template Matching algorithm failed")
+    try:
+        o = ocr.bulkPointOCR(points, image, w, h)
+    except:
+        return (500, "Internal Server Error: OCR failed")
+    return (200, o)
+
+def performCVByURL(url):
+    try:
+        image = urlHandler.getGDImage(url)
+    except:
+        return (400, "Not Found: Could not download an image at given url")
+    try:
+        templates = utils.getTemplates()
+        w, h = utils.hwAverage(templates)[::-1]
+        # w, h = template.shape[::-1]
+    except:
+        return (500, "Internal Server Error: Failed to handle templates")
+    try:
+        points = detection.findPointsAllTemplates(image, threshold, templates)
     except:
         return (500, "Internal Server Error: Template Matching algorithm failed")
     try:
