@@ -5,13 +5,14 @@ from flask_cors import CORS
 from redis import Redis
 from worker import conn
 import rq
+
 #import urllib
 #import datetime
 
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
-q = Queue(connection=conn)
+q = rq.Queue(connection=conn)
 
 class HelloWorld(Resource):
     def get(self):
@@ -88,6 +89,10 @@ class Ping(Resource):
             rq_job = rq.job.Job.fetch(self.id, connection=conn) # If bug, probably connection=conn
         except (redis.exceptions.RedisError, rq.exceptions.NoSuchJobError):
             return None
+        if rq_job.is_finished:
+            return rq_job.result, 200
+        else:
+            return 202
         if url == '':
             abort(400, "Bad Request: Invalid URL")
         try:
