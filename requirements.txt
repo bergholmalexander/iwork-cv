@@ -1,5 +1,6 @@
 flask
 flask-RESTful
+flask_cors
 gunicorn
 requests
 numpy

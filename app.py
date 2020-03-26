@@ -1,17 +1,12 @@
+import requests, urlHandler, detection, ocr, json, utils, time
 from flask import Flask, request, abort
 from flask_restful import Resource, Api
-import requests
-import urllib
-import urlHandler
-import detection
-import ocr
-import json
-import utils
-import time
-import datetime
+from flask_cors import CORS
+#import urllib
+#import datetime
 
 app = Flask(__name__)
-api = Api(app)
+api = CORS(app)
 
 class HelloWorld(Resource):
     def get(self):
