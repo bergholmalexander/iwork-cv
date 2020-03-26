@@ -86,34 +86,13 @@ class Ping(Resource):
     def get(self, id):
         # TODO: Error checking i.e. id empty
         try:
-            rq_job = rq.job.Job.fetch(self.id, connection=conn) # If bug, probably connection=conn
-        except (redis.exceptions.RedisError, rq.exceptions.NoSuchJobError):
-            return None
+            rq_job = rq.job.Job.fetch(id, connection=conn) # If bug, probably connection=conn
+        except: #(redis.exceptions.RedisError, rq.exceptions.NoSuchJobError)
+            abort(400, "Bad Request: ID was not found")
         if rq_job.is_finished:
             return rq_job.result, 200
         else:
             return 202
-        if url == '':
-            abort(400, "Bad Request: Invalid URL")
-        try:
-            image = urlHandler.getGDImage(url)
-        except:
-            abort(404, "Not Found: Could not download an image at given url")
-        try:
-            templates = utils.getTemplates()
-            w, h = utils.hwAverage(templates)[::-1]
-            # w, h = template.shape[::-1]
-        except:
-            abort(500, "Internal Server Error: Failed to handle templates")
-        try:
-            points = detection.findPointsAllTemplates(image, 0.5, templates)
-        except:
-            abort(500, "Internal Server Error: Template Matching algorithm failed")
-        try:
-            o = ocr.bulkPointOCR(points, image, w, h)
-        except:
-            abort(500, "Internal Server Error: OCR failed")
-        return o, 200
 
 api.add_resource(HelloWorld, '/') # Landing page
 api.add_resource(GetCoordinates, '/floors/detect/<string:id>')
