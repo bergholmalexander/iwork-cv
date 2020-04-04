@@ -70,7 +70,7 @@ class Ping(Resource):
             abort(400, "Bad Request: ID was not found")
         if rq_job.is_finished:
             if rq_job.result[0] != 200:
-                abort(rq_job.result[0], rq_job.result[1])
+                abort(rq_job.result[1], rq_job.result[0])
             return rq_job.result[1], 200
         else:
             return "Incomplete task", 202
